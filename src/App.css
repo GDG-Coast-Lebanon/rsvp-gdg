@@ -1,0 +1,650 @@
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    background-color: #f8f9fa;
+}
+
+.app-header {
+    margin-bottom: 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-text h1 {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.header-text p {
+    color: var(--text-secondary);
+}
+
+.logo-container {
+    background: white;
+    padding: 20px 40px;
+    border-radius: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    display: inline-block;
+}
+
+.logo {
+    height: 60px;
+    object-fit: contain;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 650px;
+}
+
+.single-page-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-section {
+    background: white;
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-section h2 {
+    font-size: 20px;
+    color: var(--google-blue);
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+}
+
+.form-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: -12px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* Reusable FormField */
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.required-star {
+    color: var(--google-red);
+    margin-left: 4px;
+}
+
+.field-input-container input[type="text"],
+.field-input-container input[type="email"],
+.field-input-container input[type="tel"],
+.field-input-container input[type="url"],
+.field-input-container select,
+.field-input-container textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.2s;
+    background-color: #fff;
+}
+
+.field-input-container input:focus,
+.field-input-container select:focus,
+.field-input-container textarea:focus {
+    border-color: var(--google-blue);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--google-red);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.form-field.has-error .field-input-container input,
+.form-field.has-error .field-input-container select,
+.form-field.has-error .field-input-container textarea,
+.form-field.has-error .attendance-card,
+.form-field.has-error .search-input-wrapper input {
+    border-color: var(--google-red);
+    background-color: #fffaf9;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.checkbox-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 8px;
+}
+
+.checkbox-label,
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+.checkbox-label input,
+.radio-label input {
+    margin: 0;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--google-blue);
+}
+
+.radio-group {
+    display: flex;
+    gap: 24px;
+}
+
+/* Pill Buttons */
+.pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pill-btn {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    /* Thinner softer border */
+    border-radius: 100px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    /* Slightly less bold */
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.pill-btn:hover {
+    border-color: #9ca3af;
+    background: #f8fafc;
+}
+
+.pill-btn.active {
+    border-color: var(--google-blue);
+    background: rgba(66, 133, 244, 0.08);
+    /* Lighter background fill */
+    color: var(--google-blue);
+}
+
+/* UI components for slider */
+.sliders-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.experience-slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.slider-category-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--google-blue);
+}
+
+.custom-slider-wrapper {
+    position: relative;
+    width: calc(100% - 20px);
+    margin: 0 auto;
+}
+
+.experience-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    outline: none;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    margin: 0;
+}
+
+.experience-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--google-blue);
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s;
+    margin-top: 0px;
+}
+
+.experience-range::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.experience-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--google-blue);
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s;
+}
+
+.slider-ticks {
+    position: relative;
+    height: 60px;
+    /* Increased height to accommodate staggered labels */
+    margin-top: 8px;
+    width: 100%;
+    pointer-events: none;
+}
+
+.slider-tick {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.tick-mark {
+    width: 2px;
+    height: 8px;
+    background-color: var(--border-color);
+    margin-bottom: 6px;
+    transition: all 0.2s;
+    border-radius: 2px;
+}
+
+.slider-tick.active .tick-mark {
+    background-color: var(--google-blue);
+    height: 12px;
+}
+
+.tick-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+    width: 90px;
+    line-height: 1.3;
+    transition: all 0.2s;
+    /* Optional: Ensure text wraps nicely */
+    word-break: break-word;
+}
+
+.slider-tick.active .tick-label {
+    color: var(--google-blue);
+    font-weight: 600;
+}
+
+/* Stagger labels on smaller screens to prevent overlap */
+@media (max-width: 650px) {
+    .slider-ticks {
+        height: 80px;
+        /* Even more space needed for dramatic staggering */
+    }
+
+    .tick-label {
+        font-size: 10px;
+        width: 70px;
+    }
+
+    /* Target every even tick and push it down */
+    .slider-tick:nth-child(even) .tick-label {
+        margin-top: 18px;
+        /* Push the label down further */
+    }
+
+    /* Optional: connect the pushed-down label with a faint line */
+    .slider-tick:nth-child(even)::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        /* Start at the bottom of the original tick mark */
+        width: 1px;
+        height: 18px;
+        background-color: var(--border-color);
+        opacity: 0.5;
+        z-index: -1;
+    }
+}
+
+/* Existing Search and Badge styles */
+.search-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.search-input-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--text-secondary);
+}
+
+.search-input-wrapper input {
+    padding-left: 44px !important;
+}
+
+.results-list {
+    background: white;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    max-height: 180px;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.result-entry {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.result-entry:hover {
+    background: #f1f5f9;
+}
+
+.add-new-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: #f0f4ff;
+    border-radius: 10px;
+    color: var(--google-blue);
+    font-size: 14px;
+    border: 1px dashed var(--google-blue);
+}
+
+.selected-indicator {
+    font-size: 13px;
+    color: var(--google-green);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
+}
+
+.badge-preview {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px dashed var(--border-color);
+    margin-top: 8px;
+}
+
+.badge-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.badge-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.badge-role {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.badge-company {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--google-blue);
+}
+
+.badge-footer {
+    margin-top: 16px;
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+/* Attendance Options */
+.attendance-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.attendance-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    text-align: left;
+    transition: all 0.2s;
+    background: white;
+}
+
+.attendance-card.active {
+    border-color: var(--google-blue);
+    background: rgba(66, 133, 244, 0.05);
+}
+
+.card-top {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.card-text strong {
+    font-size: 15px;
+    display: block;
+}
+
+.card-text span {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.card-tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 100px;
+}
+
+.card-tag.high {
+    background: rgba(52, 168, 83, 0.1);
+    color: var(--google-green);
+}
+
+.card-tag.neutral {
+    background: #f1f5f9;
+    color: var(--text-secondary);
+}
+
+.icon-blue {
+    color: var(--google-blue);
+}
+
+.icon-green {
+    color: var(--google-green);
+}
+
+.icon-yellow {
+    color: var(--google-yellow);
+}
+
+.icon-red {
+    color: var(--google-red);
+}
+
+.card-tag.danger {
+    background: rgba(234, 67, 53, 0.1);
+    color: var(--google-red);
+}
+
+.disclaimer-alert {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-radius: 12px;
+    color: #92400e;
+    font-size: 14px;
+    line-height: 1.5;
+    align-items: flex-start;
+}
+
+.disclaimer-alert .icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.form-actions {
+    margin-top: 10px;
+    position: sticky;
+    bottom: 20px;
+    z-index: 100;
+}
+
+.btn-primary.btn-large {
+    width: 100%;
+    padding: 18px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: 16px;
+    background-color: var(--google-blue);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(66, 133, 244, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary.btn-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.closed-container,
+.success-container {
+    justify-content: center;
+    text-align: center;
+    gap: 32px;
+}
+
+.closed-message,
+.success-message {
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.warning-icon {
+    color: var(--google-yellow);
+    margin-bottom: 16px;
+}
+
+.success-icon {
+    color: var(--google-green);
+    margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .form-section {
+        padding: 20px;
+    }
+
+    .attendance-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .card-tag {
+        align-self: flex-start;
+    }
+
+    .pill-btn {
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+}
