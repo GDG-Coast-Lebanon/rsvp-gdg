@@ -280,6 +280,8 @@ const App = () => {
         company: '',
         university: '',
         referral: '',
+        referralOtherText: '',
+        referralPartnerText: '',
         region: '',
         ageRange: '',
         gender: '',
@@ -416,8 +418,15 @@ const App = () => {
         e.preventDefault();
         if (validate()) {
             setIsSubmitting(true);
-            // Log form data for debugging API
-            console.log("Form Data Submitted:", formData);
+            // Build referral value
+            let referralValue = formData.referral;
+            if (formData.referral === 'Via Partner' && formData.referralPartnerText) {
+                referralValue = `partner: ${formData.referralPartnerText}`;
+            } else if (formData.referral === 'Other' && formData.referralOtherText) {
+                referralValue = `Other: ${formData.referralOtherText}`;
+            }
+            const submitData = { ...formData, referral: referralValue };
+            console.log("Form Data Submitted:", submitData);
             // Simulate API call
             setTimeout(() => {
                 setIsSubmitting(false);
@@ -925,10 +934,10 @@ const App = () => {
 
                         <FormField label="How did you hear about DevFest?" required error={errors.referral}>
                             <SearchableSelect
-                                options={["Social Media", "University", "Friends / Colleagues", "GDG Website / Newsletter", "Other community events", "Other"]}
+                                options={["Social Media", "University", "Friends / Colleagues", "GDG Website / Newsletter", "Other community events", "Via Partner", "Other"]}
                                 value={formData.referral}
                                 onChange={(val) => {
-                                    setFormData(prev => ({ ...prev, referral: val }))
+                                    setFormData(prev => ({ ...prev, referral: val, referralOtherText: '', referralPartnerText: '' }))
                                     if (errors.referral) setErrors(prev => ({ ...prev, referral: null }))
                                     validateUpTo('referral', { referral: val });
                                 }}
@@ -936,6 +945,30 @@ const App = () => {
                                 allowAdd={false}
                                 fallbackOptions={["Other"]}
                             />
+                            {formData.referral === 'Via Partner' && (
+                                <div style={{ marginTop: '10px', paddingLeft: '12px', borderLeft: '3px solid var(--google-blue)' }}>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        style={{ background: 'rgba(66,133,244,0.04)', fontSize: '14px', fontStyle: 'italic', color: 'var(--text-secondary)' }}
+                                        placeholder="Partner name (e.g. Google, AWS...)"
+                                        value={formData.referralPartnerText}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, referralPartnerText: e.target.value }))}
+                                    />
+                                </div>
+                            )}
+                            {formData.referral === 'Other' && (
+                                <div style={{ marginTop: '10px', paddingLeft: '12px', borderLeft: '3px solid var(--google-yellow)' }}>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        style={{ background: 'rgba(251,188,5,0.05)', fontSize: '14px', fontStyle: 'italic', color: 'var(--text-secondary)' }}
+                                        placeholder="Please specify..."
+                                        value={formData.referralOtherText}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, referralOtherText: e.target.value }))}
+                                    />
+                                </div>
+                            )}
                         </FormField>
 
                         <FormField label="What are your main takeaways? (Select multiple)" required error={errors.takeaways}>
