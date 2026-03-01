@@ -4,12 +4,15 @@ import { Search, ChevronDown, X, Plus, Check } from 'lucide-react'
 /**
  * SearchableSelect
  * Props:
- *   options: string[]           — the full list of options
+ *   options: (string | object)[] — the list of options
  *   value: string               — current selected value
  *   onChange: (val) => void     — called when selection changes
  *   placeholder: string         — placeholder text
  *   allowAdd?: boolean          — allow adding custom entries (default true)
  *   fallbackOptions?: string[]  — shown when search has no results
+ *   labelKey?: string           — key for display label (if objects)
+ *   valueKey?: string           — key for internal value (if objects)
+ *   searchKey?: string          — key for extended search (if objects)
  *   className?: string
  */
 export const SearchableSelect = ({
@@ -19,12 +22,23 @@ export const SearchableSelect = ({
     placeholder = 'Select...',
     allowAdd = true,
     fallbackOptions = [],
+    labelKey,
+    valueKey,
+    searchKey,
     className = '',
 }) => {
     const [open, setOpen] = useState(false)
     const [query, setQuery] = useState('')
     const containerRef = useRef(null)
     const inputRef = useRef(null)
+
+    // Helper to get display label for the current value
+    const getLabel = (val) => {
+        if (!val) return ''
+        if (!labelKey || !valueKey) return val
+        const found = options.find(o => o[valueKey] === val)
+        return found ? found[labelKey] : val
+    }
 
     // Close on outside click
     useEffect(() => {
@@ -44,14 +58,29 @@ export const SearchableSelect = ({
     }, [open])
 
     const filtered = query.trim()
-        ? options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
+        ? options.filter(o => {
+            const q = query.toLowerCase()
+            if (typeof o === 'string') return o.toLowerCase().includes(q)
+
+            // Search in label, value, and searchKey if they exist
+            const l = labelKey && o[labelKey]?.toLowerCase().includes(q)
+            const v = valueKey && o[valueKey]?.toLowerCase().includes(q)
+            const s = searchKey && o[searchKey]?.toLowerCase().includes(q)
+            return l || v || s
+        })
         : options
 
     const showAdd = allowAdd &&
         query.trim().length > 1 &&
-        !options.find(o => o.toLowerCase() === query.toLowerCase())
+        !options.find(o => {
+            const q = query.toLowerCase()
+            if (typeof o === 'string') return o.toLowerCase() === q
+            return (labelKey && o[labelKey]?.toLowerCase() === q) ||
+                (valueKey && o[valueKey]?.toLowerCase() === q)
+        })
 
-    const select = (val) => {
+    const select = (opt) => {
+        const val = (typeof opt === 'object' && valueKey) ? opt[valueKey] : opt
         onChange(val)
         setOpen(false)
         setQuery('')
@@ -76,7 +105,7 @@ export const SearchableSelect = ({
                 aria-expanded={open}
             >
                 <span className="ss-trigger__label">
-                    {value || placeholder}
+                    {getLabel(value) || placeholder}
                 </span>
                 <span className="ss-trigger__icons">
                     {value && (
@@ -133,19 +162,25 @@ export const SearchableSelect = ({
                                 <div className="ss-empty">No results</div>
                             )
                         )}
-                        {filtered.map(opt => (
-                            <button
-                                key={opt}
-                                type="button"
-                                role="option"
-                                aria-selected={value === opt}
-                                className={`ss-option ${value === opt ? 'ss-option--active' : ''}`}
-                                onClick={() => select(opt)}
-                            >
-                                <span>{opt}</span>
-                                {value === opt && <Check size={14} className="ss-option__check" />}
-                            </button>
-                        ))}
+                        {filtered.map((opt, i) => {
+                            const label = (typeof opt === 'object' && labelKey) ? opt[labelKey] : opt
+                            const val = (typeof opt === 'object' && valueKey) ? opt[valueKey] : opt
+                            const isActive = value === val
+
+                            return (
+                                <button
+                                    key={val || i}
+                                    type="button"
+                                    role="option"
+                                    aria-selected={isActive}
+                                    className={`ss-option ${isActive ? 'ss-option--active' : ''}`}
+                                    onClick={() => select(opt)}
+                                >
+                                    <span>{label}</span>
+                                    {isActive && <Check size={14} className="ss-option__check" />}
+                                </button>
+                            )
+                        })}
                         {showAdd && (
                             <button
                                 type="button"

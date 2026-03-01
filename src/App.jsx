@@ -20,26 +20,169 @@ import { SearchableSelect } from './components/SearchableSelect'
 import './App.css'
 
 const UNIVERSITIES = [
-    "American University of Beirut (AUB)",
-    "Lebanese American University (LAU)",
-    "Saint Joseph University (USJ)",
-    "Lebanese University (LU)",
-    "Notre Dame University (NDU)",
-    "Balamand University (UOB)",
-    "Beirut Arab University (BAU)",
-    "Holy Spirit University of Kaslik (USEK)",
-    "Rafik Hariri University (RHU)",
-    "American University of Science and Technology (AUST)",
-    "Lebanese International University (LIU)",
-    "Global University",
-    "Arts, Sciences and Technology University in Lebanon (AUL)",
-    "Islamic University of Lebanon (IUL)",
-    "Antonine University (UA)",
-    "Al-Maaref University",
-    "Azm University",
-    "Phoenicia University",
-    "Manar University of Tripoli (MUT)"
-]
+    {
+        id: 'aub',
+        full_name: 'American University of Beirut',
+        abbreviation: 'AUB',
+        alt_text: 'American University of Beirut (AUB), AUB logo, American University of Beirut logo, AUB Beirut, American Univ Beirut, AUB Lebanon, American University Beirut'
+    },
+    {
+        id: 'lau',
+        full_name: 'Lebanese American University',
+        abbreviation: 'LAU',
+        alt_text: 'Lebanese American University (LAU), LAU logo, Lebanese American University logo, LAU Lebanon, Lebanese American Univ Beirut, Lebanese-American University, Lebanese American Uni, LAU Beirut Campus, LAU Byblos Campus, LAU Byblos, LAU Beirut'
+    },
+    {
+        id: 'usj',
+        full_name: 'Saint Joseph University of Beirut',
+        abbreviation: 'USJ',
+        alt_text: 'Saint Joseph University of Beirut (USJ), USJ logo, Saint Joseph University logo, Universite Saint-Joseph de Beyrouth, St Joseph University, Saint Joseph Univ Beirut, USJ Beirut'
+    },
+    {
+        id: 'lu',
+        full_name: 'Lebanese University',
+        abbreviation: 'LU, LUFS1, ULFG1',
+        alt_text: 'Lebanese University (LU), LU logo, Lebanese University logo, Universite Libanaise, UL logo, LUFS1, LUFG1, ULFG1, ULFS1, Lebanese National University, LU Lebanon, LU Hadat, LU Hadath, LU Nabatieh, LU Saida, LU Fanar, LU Tripoli'
+    },
+    {
+        id: 'bau',
+        full_name: 'Beirut Arab University',
+        abbreviation: 'BAU',
+        alt_text: 'Beirut Arab University (BAU), BAU logo, Beirut Arab University logo, BAU Lebanon, Beirut Arab Uni, BAU Beirut'
+    },
+    {
+        id: 'uob',
+        full_name: 'University of Balamand',
+        abbreviation: 'UOB',
+        alt_text: 'University of Balamand (UOB), UOB logo, University of Balamand logo, UOB Lebanon, Balamand University, Balamand Uni logo'
+    },
+    {
+        id: 'ndu',
+        full_name: 'Notre Dame University-Louaize',
+        abbreviation: 'NDU',
+        alt_text: 'Notre Dame University-Louaize (NDU), NDU logo, Notre Dame University Louaize logo, Notre Dame Louaize, NDU Lebanon, Notre Dame Univ Louaize'
+    },
+    {
+        id: 'usek',
+        full_name: 'Holy Spirit University of Kaslik',
+        abbreviation: 'USEK',
+        alt_text: 'Holy Spirit University of Kaslik (USEK), USEK logo, Holy Spirit University of Kaslik logo, USEK Lebanon, Holy Spirit Univ Kaslik, Universite Saint-Esprit de Kaslik'
+    },
+    {
+        id: 'haigazian',
+        full_name: 'Haigazian University',
+        abbreviation: 'HU',
+        alt_text: 'Haigazian University (HU), HU logo, Haigazian University logo, Haigazian University Beirut, Haigazian Uni Lebanon'
+    },
+    {
+        id: 'upa',
+        full_name: 'Antonine University',
+        abbreviation: 'UPA',
+        alt_text: 'Antonine University (UPA), UPA logo, Antonine University logo, Universite Antonine, Antonine Uni Lebanon'
+    },
+    {
+        id: 'iul',
+        full_name: 'Islamic University of Lebanon',
+        abbreviation: 'IUL',
+        alt_text: 'Islamic University of Lebanon (IUL), IUL logo, Islamic University of Lebanon logo, IUL Lebanon, Islamic Univ Lebanon, Universite Islamique du Liban'
+    },
+    {
+        id: 'global',
+        full_name: 'Global University',
+        abbreviation: 'GU',
+        alt_text: 'Global University (GU), GU logo, Global University logo, Global Univ Lebanon, Global Uni Beirut'
+    },
+    {
+        id: 'jinan',
+        full_name: 'Jinan University',
+        abbreviation: 'JU',
+        alt_text: 'Jinan University (JU), JU logo, Jinan University logo, Jinan Univ Lebanon, Universite Jinan, Jinan Uni Beirut'
+    },
+    {
+        id: 'aul',
+        full_name: 'Arts, Sciences and Technology University in Lebanon',
+        abbreviation: 'AUL',
+        alt_text: 'Arts, Sciences and Technology University in Lebanon (AUL), AUL logo, Arts, Sciences and Technology University in Lebanon logo, AUL Lebanon, AUL University, Arts and Sciences University'
+    },
+    {
+        id: 'usal',
+        full_name: 'USAL',
+        abbreviation: 'USAL',
+        alt_text: 'USAL - University Of Sciences And Arts In Lebanon, USAL logo, USAL Lebanon, University Of Sciences And Arts In Lebanon logo, USAL Univ Lebanon'
+    },
+    {
+        id: 'liu',
+        full_name: 'Lebanese International University',
+        abbreviation: 'LIU',
+        alt_text: 'Lebanese International University (LIU), LIU logo, Lebanese International University logo, LIU Lebanon, Lebanese Intl Univ, LIU Beirut'
+    },
+    {
+        id: 'mut',
+        full_name: 'Manar University of Tripoli',
+        abbreviation: 'MUT',
+        alt_text: 'Manar University of Tripoli (MUT), MUT logo, Manar University of Tripoli logo, MUT Lebanon, Manar Univ Lebanon'
+    },
+    {
+        id: 'meu',
+        full_name: 'Middle East University',
+        abbreviation: 'MEU',
+        alt_text: 'Middle East University (MEU), MEU logo, Middle East University logo, MEU Lebanon, Middle East Univ Beirut'
+    },
+    {
+        id: 'sagesse',
+        full_name: 'Sagesse University',
+        abbreviation: 'ULS',
+        alt_text: 'Sagesse University (ULS), ULS logo, Sagesse University logo, Universite La Sagesse, Sagesse Univ Lebanon, ULS Lebanon'
+    },
+    {
+        id: 'aou',
+        full_name: 'Arab Open University',
+        abbreviation: 'AOU, AO University',
+        alt_text: 'Arab Open University (AOU), AOU logo, Arab Open University logo, AOU Lebanon, Arab Open Uni, AOU Beirut, AO University, Arab Open University Lebanon'
+    },
+    {
+        id: 'aust',
+        full_name: 'American University of Science and Technology',
+        abbreviation: 'AUST',
+        alt_text: 'American University of Science and Technology (AUST), AUST logo, American University of Science and Technology logo, AUST Lebanon, American Univ Science Technology, AUST Beirut'
+    },
+    {
+        id: 'rhu',
+        full_name: 'Rafik Hariri University',
+        abbreviation: 'RHU',
+        alt_text: 'Rafik Hariri University (RHU), RHU logo, Rafik Hariri University logo, RHU Lebanon, Rafic Hariri Univ, Rafik Hariri Uni Beirut'
+    },
+    {
+        id: 'aut',
+        full_name: 'American University of Technology',
+        abbreviation: 'AUT',
+        alt_text: 'American University of Technology (AUT), AUT logo, American University of Technology logo, AUT Lebanon, American Univ Tech, AUT Beirut'
+    },
+    {
+        id: 'mubs',
+        full_name: 'Modern University for Business and Science',
+        abbreviation: 'MUBS',
+        alt_text: 'Modern University for Business and Science (MUBS), MUBS logo, Modern University for Business and Science logo, MUBS Lebanon, Modern Univ Business Science, MUBS Beirut'
+    },
+    {
+        id: 'aku',
+        full_name: 'Al-Kafaàt University',
+        abbreviation: 'AKU',
+        alt_text: 'Al-Kafaat University (AKU), AKU logo, Al-Kafaat University logo, Al Kafaat University, AKU Lebanon, Al Kafaat Uni'
+    },
+    {
+        id: 'self',
+        full_name: 'Self taught',
+        abbreviation: 'SELF',
+        alt_text: 'Self-taught, Self-taught logo, Self-learning icon, Self-educated, Independent learning, Self taught path'
+    },
+    {
+        id: 'mu',
+        full_name: 'Al Maaref University',
+        abbreviation: 'MU',
+        alt_text: 'Al Maaref University, Almaaref, Al maaref, MU Uni, MU, Maaref'
+    },
+];
 
 const REGIONS = [
     "Beirut", "Metn/Baabda", "Jbeil/Keserwen", "Aley/Chouf",
@@ -139,17 +282,23 @@ const App = () => {
     }, [])
 
     useEffect(() => {
-        if (searchTerm.length > 1) {
-            const results = UNIVERSITIES.filter(u =>
-                u.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+        const selectedUniv = UNIVERSITIES.find(u => u.abbreviation === formData.university);
+        const isAlreadySelected = (selectedUniv && searchTerm === selectedUniv.full_name) || (formData.company && searchTerm === formData.company);
+
+        if (searchTerm.length > 1 && !isAlreadySelected) {
+            const results = UNIVERSITIES.filter(u => {
+                const q = searchTerm.toLowerCase()
+                return u.full_name.toLowerCase().includes(q) ||
+                    u.abbreviation.toLowerCase().includes(q) ||
+                    u.alt_text.toLowerCase().includes(q)
+            })
             setSearchResults(results)
-            setShowAddCompany(results.length === 0 || !results.find(r => r === searchTerm))
+            setShowAddCompany(results.length === 0 && !UNIVERSITIES.find(u => u.full_name.toLowerCase() === searchTerm.toLowerCase()))
         } else {
             setSearchResults([])
             setShowAddCompany(false)
         }
-    }, [searchTerm])
+    }, [searchTerm, formData.university, formData.company])
 
     // Derive status simple category for the badge based on experience selection
     useEffect(() => {
@@ -477,15 +626,15 @@ const App = () => {
                                     <div className="results-list">
                                         {searchResults.map(result => (
                                             <div
-                                                key={result}
+                                                key={result.id}
                                                 className="result-entry"
                                                 onClick={() => {
-                                                    setFormData({ ...formData, university: result, company: '' })
-                                                    setSearchTerm(result)
+                                                    setFormData({ ...formData, university: result.abbreviation, company: '' })
+                                                    setSearchTerm(result.full_name)
                                                     setSearchResults([])
                                                 }}
                                             >
-                                                {result}
+                                                {result.full_name}
                                             </div>
                                         ))}
                                     </div>
@@ -506,9 +655,9 @@ const App = () => {
                                     </button>
                                 )}
 
-                                {(formData.company || formData.university) && !showAddCompany && searchResults.length === 0 && searchTerm === (formData.company || formData.university) && (
-                                    <div className="selected-indicator">
-                                        <CheckCircle2 size={16} className="icon-green" /> Selected: {searchTerm}
+                                {(formData.company || formData.university) && (searchTerm === formData.company || searchTerm === UNIVERSITIES.find(u => u.abbreviation === formData.university)?.full_name) && (
+                                    <div className="selected-indicator success">
+                                        <CheckCircle2 size={16} /> Successfully Selected: {searchTerm}
                                     </div>
                                 )}
                             </div>
@@ -523,7 +672,7 @@ const App = () => {
                                         formData.status === 'student' ? 'Student' :
                                             formData.status === 'fresh_graduate' ? 'Fresh Graduate' : 'Attendee'}
                                 </div>
-                                <div className="badge-company">{formData.company || formData.university || searchTerm || 'Company / University'}</div>
+                                <div className="badge-company">{formData.company || UNIVERSITIES.find(u => u.abbreviation === formData.university)?.full_name || searchTerm || 'Company / University'}</div>
                                 <div className="badge-footer">GDG Lebanon RSVP</div>
                             </div>
                         </div>
