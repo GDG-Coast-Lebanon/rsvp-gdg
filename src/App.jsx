@@ -279,6 +279,7 @@ const App = () => {
         status: '', // Derived from experience (student/prof/fresh)
         company: '',
         university: '',
+        referral: '',
         region: '',
         ageRange: '',
         gender: '',
@@ -286,7 +287,6 @@ const App = () => {
         phone: '',
         attendedBefore: 3, // Defaulting to "No" (index 3) or could leave null
         takeaways: [],
-        referral: '',
         techInterests: [],
         otherTechInterestInput: '',
         comments: '',
@@ -370,7 +370,6 @@ const App = () => {
         if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Valid email is required';
         if (!formData.firstName) newErrors.firstName = 'First name is required';
         if (!formData.lastName) newErrors.lastName = 'Last name is required';
-        if (!formData.specialization) newErrors.specialization = 'Please select a specialization';
         if (formData.activeExpCategories.length === 0) newErrors.experience = 'Please select at least one experience category';
 
         if (formData.phone && formData.phone.replace(/^\+?961/, '').length > 0 && !/^\+961(03\d{6}|[7-9]\d{7})$/.test(formData.phone)) {
@@ -392,9 +391,11 @@ const App = () => {
             newErrors.companySearch = 'Company or university is required. Search and select or add a new one.';
         }
 
+        if (!formData.specialization) newErrors.specialization = 'Please select a specialization';
+
         const isProfOrFresh = formData.status === 'professional' || formData.status === 'fresh_graduate';
-        if (!isProfOrFresh && (formData.university || formData.company) && !formData.specialization) {
-            newErrors.specialization = 'Please select your specialization';
+        if (!isProfOrFresh && (formData.university || formData.company) && !formData.major) {
+            newErrors.major = 'Please choose your major';
         }
 
         setErrors(newErrors);
@@ -452,6 +453,7 @@ const App = () => {
             'experience',
             'specialization',
             'companySearch', // Represents Company/University requirement
+            'major',
             'attendedBefore',
             'referral',
             'takeaways',
@@ -479,11 +481,13 @@ const App = () => {
         if (!currentData.region) tempErrors.region = 'Please select a region';
         if (currentData.activeExpCategories.length === 0) tempErrors.experience = 'Please select at least one experience category';
 
-        const isProfOrFresh = currentData.status === 'professional' || currentData.status === 'fresh_graduate';
-        if (!isProfOrFresh && (currentData.university || currentData.company) && !currentData.specialization) {
-            tempErrors.specialization = 'Please select your specialization';
-        } else if (!currentData.specialization) {
+        if (!currentData.specialization) {
             tempErrors.specialization = 'Please select a specialization';
+        }
+
+        const isProfOrFresh = currentData.status === 'professional' || currentData.status === 'fresh_graduate';
+        if (!isProfOrFresh && (currentData.university || currentData.company) && !currentData.major) {
+            tempErrors.major = 'Please choose your major';
         }
 
         if (!currentData.company && !currentData.university && !searchTerm) {
@@ -678,22 +682,20 @@ const App = () => {
                     <section className="form-section">
                         <h2>Professional Profile</h2>
 
-                        {isProfessionalOrFreshGrad && (
-                            <FormField label="Your Specialization" required error={errors.specialization}>
-                                <SearchableSelect
-                                    options={SPECIALIZATIONS}
-                                    value={formData.specialization}
-                                    onChange={(val) => {
-                                        setFormData(prev => ({ ...prev, specialization: val }))
-                                        if (errors.specialization) setErrors(prev => ({ ...prev, specialization: null }))
-                                        validateUpTo('specialization', { specialization: val });
-                                    }}
-                                    placeholder="Select specialization"
-                                    allowAdd={false}
-                                    fallbackOptions={["Other in tech", "Other non-tech"]}
-                                />
-                            </FormField>
-                        )}
+                        <FormField label="Your Specialization" required error={errors.specialization}>
+                            <SearchableSelect
+                                options={SPECIALIZATIONS}
+                                value={formData.specialization}
+                                onChange={(val) => {
+                                    setFormData(prev => ({ ...prev, specialization: val }))
+                                    if (errors.specialization) setErrors(prev => ({ ...prev, specialization: null }))
+                                    validateUpTo('specialization', { specialization: val });
+                                }}
+                                placeholder="Select specialization"
+                                allowAdd={false}
+                                fallbackOptions={["Other in tech", "Other non-tech"]}
+                            />
+                        </FormField>
 
                         <FormField label="Experience / Study Category (Select all that apply)" required error={errors.experience}>
                             {/*add hint text */}
@@ -797,7 +799,7 @@ const App = () => {
                                     </span>
                                 )}
 
-                                {searchResults.length > 0 && isCompanyFocused && (
+                                {(searchResults.length > 0 || (showAddCompany && searchTerm.length > 1)) && isCompanyFocused && (
                                     <div className="results-list">
                                         {searchResults.map(result => (
                                             <div
@@ -812,21 +814,21 @@ const App = () => {
                                                 {result.full_name}
                                             </div>
                                         ))}
-                                    </div>
-                                )}
 
-                                {showAddCompany && searchTerm.length > 1 && isCompanyFocused && (
-                                    <button
-                                        type="button"
-                                        className="add-new-btn"
-                                        onClick={() => {
-                                            setFormData({ ...formData, company: searchTerm, university: '' })
-                                            setIsCompanyFocused(false)
-                                        }}
-                                    >
-                                        <Plus size={16} />
-                                        <span>Add "<strong>{searchTerm}</strong>" as your institution</span>
-                                    </button>
+                                        {searchTerm.length > 1 && (
+                                            <button
+                                                type="button"
+                                                className="ss-add-btn"
+                                                onClick={() => {
+                                                    setFormData({ ...formData, company: searchTerm, university: '' })
+                                                    setIsCompanyFocused(false)
+                                                }}
+                                            >
+                                                <Plus size={14} />
+                                                <span>Add "<strong>{searchTerm}</strong>"</span>
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
 
                                 {(formData.company || formData.university) && (searchTerm === formData.company || searchTerm === UNIVERSITIES.find(u => u.abbreviation === formData.university)?.full_name) && (
@@ -838,14 +840,14 @@ const App = () => {
                         </FormField>
 
                         {!isProfessionalOrFreshGrad && (formData.company || formData.university) && (
-                            <FormField label="Your Specialization" required error={errors.specialization}>
+                            <FormField label="Your Major" required error={errors.major}>
                                 <SearchableSelect
                                     options={UNIVERSITY_MAJORS}
-                                    value={formData.specialization}
+                                    value={formData.major}
                                     onChange={(val) => {
-                                        setFormData(prev => ({ ...prev, specialization: val }))
-                                        if (errors.specialization) setErrors(prev => ({ ...prev, specialization: null }))
-                                        validateUpTo('specialization', { specialization: val });
+                                        setFormData(prev => ({ ...prev, major: val }))
+                                        if (errors.major) setErrors(prev => ({ ...prev, major: null }))
+                                        validateUpTo('major', { major: val });
                                     }}
                                     placeholder="e.g., Computer Science, Engineering, Business Administration"
                                     allowAdd={true}
