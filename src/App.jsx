@@ -16,6 +16,7 @@ import {
 import logo from './assets/logo.png'
 import { EVENT_CONFIG, isRegistrationOpen } from './config'
 import { FormField } from './components/FormField'
+import { SearchableSelect } from './components/SearchableSelect'
 import './App.css'
 
 const UNIVERSITIES = [
@@ -47,7 +48,7 @@ const REGIONS = [
 
 const EXPERIENCE_CATEGORIES = {
     Student: [
-        "1st - 2nd Year",
+        "1st - 2nd",
         "3rd Year",
         "Master Student",
         "PHD",
@@ -74,9 +75,9 @@ const EXPERIENCE_CATEGORIES = {
 }
 
 const SPECIALIZATIONS = [
-    "AI Engineer / Researcher", "Full Stack Developer", "Data Scientist / Engineer",
-    "Cloud / DevOps Engineer", "Backend Developer", "Frontend Developer",
-    "Mobile Developer", "Product / Project Manager", "UX/UI Designer", "QA Engineer",, "Other in tech", "Other non-tech"
+    "AI Engineer", "AI Researcher", "Full Stack Developer", "Data Scientist", "Data Engineer",
+    "Cloud Engineer", "DevOps Engineer", "Backend Developer", "Frontend Developer",
+    "Mobile Developer", "Product Manager", "Project Manager", "UX/UI Designer", "QA Engineer", "Other in tech", "Other non-tech"
 ]
 
 const TECH_INTERESTS = [
@@ -86,10 +87,10 @@ const TECH_INTERESTS = [
 ]
 
 const TAKEAWAYS = [
-    "Learning about new technologies", "Networking with peers/experts",
-    "Hands-on workshops", "Listening to inspiring speakers",
-    "Engaging with the local tech community", "Career opportunities",
-    "Participating in the Open Source challenge", "Other"
+    "New technologies", "Networking",
+    "Hands-on workshops", "Inspiring speakers",
+    "Local tech community", "Career opportunities",
+    "Open Source challenge", "Other"
 ]
 
 const App = () => {
@@ -326,13 +327,19 @@ const App = () => {
 
                         <div className="grid-2">
                             <FormField label="Region" required error={errors.region}>
-                                <select name="region" value={formData.region} onChange={handleChange}>
-                                    <option value="">Select your region</option>
-                                    {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                                </select>
+                                <SearchableSelect
+                                    options={REGIONS}
+                                    value={formData.region}
+                                    onChange={(val) => {
+                                        setFormData(prev => ({ ...prev, region: val }))
+                                        if (errors.region) setErrors(prev => ({ ...prev, region: null }))
+                                    }}
+                                    placeholder="Select your region"
+                                    allowAdd={false}
+                                />
                             </FormField>
                             <FormField label="Age Range (Optional)">
-                                <select name="ageRange" value={formData.ageRange} onChange={handleChange}>
+                                <select name="ageRange" value={formData.ageRange} onChange={handleChange} className={!formData.ageRange ? 'select-placeholder' : ''}>
                                     <option value="">Select age range</option>
                                     <option value="18-23">18 - 23 years</option>
                                     <option value="24-30">24 - 30 years</option>
@@ -342,7 +349,7 @@ const App = () => {
                         </div>
 
                         <FormField label="Gender (Optional)">
-                            <select name="gender" value={formData.gender} onChange={handleChange}>
+                            <select name="gender" value={formData.gender} onChange={handleChange} className={!formData.gender ? 'select-placeholder' : ''}>
                                 <option value="">Select gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -356,14 +363,21 @@ const App = () => {
                         <h2>Professional Profile</h2>
 
                         <FormField label="Your Specialization" required error={errors.specialization}>
-                            <select name="specialization" value={formData.specialization} onChange={handleChange}>
-                                <option value="">Select specialization</option>
-                                {SPECIALIZATIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
+                            <SearchableSelect
+                                options={SPECIALIZATIONS}
+                                value={formData.specialization}
+                                onChange={(val) => {
+                                    setFormData(prev => ({ ...prev, specialization: val }))
+                                    if (errors.specialization) setErrors(prev => ({ ...prev, specialization: null }))
+                                }}
+                                placeholder="Select specialization"
+                                allowAdd={false}
+                                fallbackOptions={["Other in tech", "Other non-tech"]}
+                            />
                         </FormField>
 
                         <FormField label="Experience / Study Category (Select all that apply)" required error={errors.experience}>
-                            <div className="pill-grid">
+                            <div className="pill-grid pill-grid--equal">
                                 {Object.keys(EXPERIENCE_CATEGORIES).map(cat => (
                                     <button
                                         key={cat}
@@ -530,15 +544,17 @@ const App = () => {
                         </FormField>
 
                         <FormField label="How did you hear about DevFest?" required error={errors.referral}>
-                            <select name="referral" value={formData.referral} onChange={handleChange}>
-                                <option value="">Select source</option>
-                                <option value="Social Media">Social Media</option>
-                                <option value="University">University</option>
-                                <option value="Friends">Friends / Colleagues</option>
-                                <option value="GDG Website">GDG Website / Newsletter</option>
-                                <option value="Other events">Other community events</option>
-                                <option value="Other">Other</option>
-                            </select>
+                            <SearchableSelect
+                                options={["Social Media", "University", "Friends / Colleagues", "GDG Website / Newsletter", "Other community events", "Other"]}
+                                value={formData.referral}
+                                onChange={(val) => {
+                                    setFormData(prev => ({ ...prev, referral: val }))
+                                    if (errors.referral) setErrors(prev => ({ ...prev, referral: null }))
+                                }}
+                                placeholder="Select source"
+                                allowAdd={false}
+                                fallbackOptions={["Other"]}
+                            />
                         </FormField>
 
                         <FormField label="What are your main takeaways? (Select multiple)" required error={errors.takeaways}>
@@ -604,7 +620,7 @@ const App = () => {
                             <div className="attendance-grid">
                                 <button
                                     type="button"
-                                    className={`attendance-card ${formData.attendanceType === 'full_day' ? 'active' : ''}`}
+                                    className={`attendance-card ${formData.attendanceType === 'full_day' ? 'active active-blue' : ''}`}
                                     onClick={() => {
                                         setFormData({ ...formData, attendanceType: 'full_day' });
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
@@ -622,7 +638,7 @@ const App = () => {
 
                                 <button
                                     type="button"
-                                    className={`attendance-card ${formData.attendanceType === 'few_hours' ? 'active' : ''}`}
+                                    className={`attendance-card ${formData.attendanceType === 'few_hours' ? 'active active-green' : ''}`}
                                     onClick={() => {
                                         setFormData({ ...formData, attendanceType: 'few_hours' });
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
@@ -640,7 +656,7 @@ const App = () => {
 
                                 <button
                                     type="button"
-                                    className={`attendance-card ${formData.attendanceType === 'networking' ? 'active' : ''}`}
+                                    className={`attendance-card ${formData.attendanceType === 'networking' ? 'active active-yellow' : ''}`}
                                     onClick={() => {
                                         setFormData({ ...formData, attendanceType: 'networking' });
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
@@ -658,12 +674,11 @@ const App = () => {
 
                                 <button
                                     type="button"
-                                    className={`attendance-card ${formData.attendanceType === 'afternoon' ? 'active alert' : ''}`}
+                                    className={`attendance-card ${formData.attendanceType === 'afternoon' ? 'active active-red' : ''}`}
                                     onClick={() => {
                                         setFormData({ ...formData, attendanceType: 'afternoon' });
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
                                     }}
-                                    style={formData.attendanceType === 'afternoon' ? { borderColor: 'var(--google-red)', backgroundColor: 'rgba(234, 67, 53, 0.05)' } : {}}
                                 >
                                     <div className="card-top">
                                         <Sunset className="icon-red" />
@@ -679,7 +694,7 @@ const App = () => {
 
                         <div className="disclaimer-alert">
                             <Utensils size={28} className="icon" />
-                            <p>Important Note: Meals are guaranteed only for Full Day Experience attendees availability. Opting for a shorter, more targeted visit helps us accommodate more attendees and increases your chances of being selected! Swags depends on availability.</p>
+                            <p>Important Note: Meals are guaranteed only for Full Day Experience attendees. Opting for a shorter, more targeted visit helps us accommodate more attendees and might increase your chances of being selected! As we try to have diverse attendees.</p>
                         </div>
 
                         <FormField label="Additional Comments / 5min demo proposal (Optional)">
