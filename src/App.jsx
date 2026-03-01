@@ -991,11 +991,12 @@ const App = () => {
                                 ))}
                             </div>
                             {formData.takeaways.includes("Other") && (
-                                <div style={{ marginTop: '12px' }}>
+                                <div style={{ marginTop: '10px', paddingLeft: '12px', borderLeft: '3px solid var(--google-yellow)' }}>
                                     <input
                                         type="text"
                                         name="otherTakeawaysInput"
-                                        className={`form-input`}
+                                        className="form-input"
+                                        style={{ background: 'rgba(251,188,5,0.05)', fontSize: '14px', fontStyle: 'italic', color: 'var(--text-secondary)' }}
                                         placeholder="Please specify other takeaways..."
                                         value={formData.otherTakeawaysInput}
                                         onChange={handleChange}
@@ -1018,11 +1019,12 @@ const App = () => {
                                 ))}
                             </div>
                             {formData.techInterests.includes("Other") && (
-                                <div style={{ marginTop: '12px' }}>
+                                <div style={{ marginTop: '10px', paddingLeft: '12px', borderLeft: '3px solid var(--google-yellow)' }}>
                                     <input
                                         type="text"
                                         name="otherTechInterestInput"
-                                        className={`form-input`}
+                                        className="form-input"
+                                        style={{ background: 'rgba(251,188,5,0.05)', fontSize: '14px', fontStyle: 'italic', color: 'var(--text-secondary)' }}
                                         placeholder="Please specify other tech interests..."
                                         value={formData.otherTechInterestInput}
                                         onChange={handleChange}
