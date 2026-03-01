@@ -372,8 +372,9 @@ const App = () => {
         if (!formData.lastName) newErrors.lastName = 'Last name is required';
         if (formData.activeExpCategories.length === 0) newErrors.experience = 'Please select at least one experience category';
 
-        if (formData.phone && formData.phone.replace(/^\+?961/, '').length > 0 && !/^\+961(03\d{6}|[7-9]\d{7})$/.test(formData.phone)) {
-            newErrors.phone = 'Invalid Lebanese phone format (e.g., +961XXXXXXXX)';
+        const phoneClean = (formData.phone || '').replace(/\s+/g, '');
+        if (phoneClean && !/^(?:\+961)?(03|71|76|78|79)\d{6}$/.test(phoneClean)) {
+            newErrors.phone = 'Invalid format. Use 8 digits starting with 03, 71, 76, 78, or 79';
         }
 
         if (!formData.linkedIn) {
@@ -499,8 +500,9 @@ const App = () => {
         if (!currentData.attendanceType) tempErrors.attendanceType = 'Please select your expected attendance';
 
         // We also always check phone format specifically on blur if it has a value, regardless of order
-        if (currentData.phone && currentData.phone.replace(/^\+?961/, '').length > 0 && !/^\+961(03\d{6}|[7-9]\d{7})$/.test(currentData.phone)) {
-            tempErrors.phone = 'Invalid Lebanese phone format (e.g., +961XXXXXXXX)';
+        const phoneClean = (currentData.phone || '').replace(/\s+/g, '');
+        if (phoneClean && !/^(?:\+961)?(03|71|76|78|79)\d{6}$/.test(phoneClean)) {
+            tempErrors.phone = 'Invalid format. Use 8 digits starting with 03, 71, 76, 78, or 79';
         }
 
         setErrors(prev => {
@@ -1002,9 +1004,10 @@ const App = () => {
                                     type="button"
                                     className={`attendance-card ${formData.attendanceType === 'full_day' ? 'active active-blue' : ''}`}
                                     onClick={() => {
-                                        setFormData({ ...formData, attendanceType: 'full_day' });
+                                        const nextData = { ...formData, attendanceType: 'full_day' };
+                                        setFormData(nextData);
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
-                                        setTimeout(() => validateUpTo('attendanceType'), 0);
+                                        validateUpTo('attendanceType', { attendanceType: 'full_day' });
                                     }}
                                 >
                                     <div className="card-top">
@@ -1019,29 +1022,32 @@ const App = () => {
 
                                 <button
                                     type="button"
-                                    className={`attendance-card ${formData.attendanceType === 'few_hours' ? 'active active-green' : ''}`}
+                                    className={`attendance-card ${formData.attendanceType === 'few_hours' ? 'active active-red' : ''}`}
                                     onClick={() => {
-                                        setFormData({ ...formData, attendanceType: 'few_hours' });
+                                        const nextData = { ...formData, attendanceType: 'few_hours' };
+                                        setFormData(nextData);
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
-                                        setTimeout(() => validateUpTo('attendanceType'), 0);
+                                        validateUpTo('attendanceType', { attendanceType: 'few_hours' });
                                     }}
                                 >
                                     <div className="card-top">
-                                        <Clock className="icon-green" />
+                                        <Clock className="icon-red" />
                                         <div className="card-text">
                                             <strong>Flash Attendee (Few Hours)</strong>
                                             <span>Quick visit to catch specific talks.</span>
                                         </div>
                                     </div>
-                                    <div className="card-tag high">Higher Chance of Selection | Includes a guarantee of 1 workshop seat</div>
+                                    <div className="card-tag high">High Selection | 1 Workshop Seat</div>
                                 </button>
 
                                 <button
                                     type="button"
                                     className={`attendance-card ${formData.attendanceType === 'networking' ? 'active active-yellow' : ''}`}
                                     onClick={() => {
-                                        setFormData({ ...formData, attendanceType: 'networking' });
+                                        const nextData = { ...formData, attendanceType: 'networking' };
+                                        setFormData(nextData);
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
+                                        validateUpTo('attendanceType', { attendanceType: 'networking' });
                                     }}
                                 >
                                     <div className="card-top">
@@ -1051,20 +1057,21 @@ const App = () => {
                                             <span>Focus on making connections in the lobby and expo.</span>
                                         </div>
                                     </div>
-                                    <div className="card-tag high">Higher Chance of Selection | Skip guaranteed session seating</div>
+                                    <div className="card-tag high">High Selection | Session not guaranteed</div>
                                 </button>
 
                                 <button
                                     type="button"
-                                    className={`attendance-card ${formData.attendanceType === 'afternoon' ? 'active active-red' : ''}`}
+                                    className={`attendance-card ${formData.attendanceType === 'afternoon' ? 'active active-green' : ''}`}
                                     onClick={() => {
-                                        setFormData({ ...formData, attendanceType: 'afternoon' });
+                                        const nextData = { ...formData, attendanceType: 'afternoon' };
+                                        setFormData(nextData);
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
-                                        setTimeout(() => validateUpTo('attendanceType'), 0);
+                                        validateUpTo('attendanceType', { attendanceType: 'afternoon' });
                                     }}
                                 >
                                     <div className="card-top">
-                                        <Sunset className="icon-red" />
+                                        <Sunset className="icon-green" />
                                         <div className="card-text">
                                             <strong>Afternoon attendee</strong>
                                             <span>Access only starting 13:30 till the end of the day.</span>
