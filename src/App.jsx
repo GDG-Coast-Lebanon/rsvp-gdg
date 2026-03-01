@@ -238,6 +238,12 @@ const TAKEAWAYS = [
 
 const App = () => {
     const [isOpen, setIsOpen] = useState(true)
+    const [isVip, setIsVip] = useState(false)
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        setIsVip(params.has('vip'));
+    }, []);
 
     const [formData, setFormData] = useState({
         secretCode: '',
@@ -323,7 +329,7 @@ const App = () => {
 
     const validate = () => {
         const newErrors = {};
-        if (!formData.secretCode) newErrors.secretCode = 'Secret code is required';
+        if (isVip && !formData.secretCode) newErrors.secretCode = 'Secret code is required';
         if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Valid email is required';
         if (!formData.firstName) newErrors.firstName = 'First name is required';
         if (!formData.lastName) newErrors.lastName = 'Last name is required';
@@ -437,18 +443,20 @@ const App = () => {
             <main className="form-wrapper">
                 <form onSubmit={handleSubmit} className="single-page-form" noValidate>
 
-                    <section className="form-section">
-                        <h2>Access & Security</h2>
-                        <FormField label="Secret Code" required error={errors.secretCode}>
-                            <input
-                                type="text"
-                                name="secretCode"
-                                placeholder="Enter your VIP or general access code"
-                                value={formData.secretCode}
-                                onChange={handleChange}
-                            />
-                        </FormField>
-                    </section>
+                    {isVip && (
+                        <section className="form-section">
+                            <h2>Access & Security</h2>
+                            <FormField label="Secret Code" required error={errors.secretCode}>
+                                <input
+                                    type="text"
+                                    name="secretCode"
+                                    placeholder="Enter your VIP or general access code"
+                                    value={formData.secretCode}
+                                    onChange={handleChange}
+                                />
+                            </FormField>
+                        </section>
+                    )}
 
                     <section className="form-section">
                         <h2>Personal Information</h2>
