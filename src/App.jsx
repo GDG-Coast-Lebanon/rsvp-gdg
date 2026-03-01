@@ -808,9 +808,12 @@ const App = () => {
                                                 key={result.id}
                                                 className="result-entry"
                                                 onClick={() => {
-                                                    setFormData({ ...formData, university: result.abbreviation, company: '' })
+                                                    const newUniversity = result.abbreviation;
+                                                    setFormData({ ...formData, university: newUniversity, company: '' })
                                                     setSearchTerm(result.full_name)
                                                     setIsCompanyFocused(false)
+                                                    if (errors.companySearch) setErrors(prev => ({ ...prev, companySearch: null }));
+                                                    validateUpTo('companySearch', { university: newUniversity, company: '' });
                                                 }}
                                             >
                                                 {result.full_name}
@@ -824,6 +827,8 @@ const App = () => {
                                                 onClick={() => {
                                                     setFormData({ ...formData, company: searchTerm, university: '' })
                                                     setIsCompanyFocused(false)
+                                                    if (errors.companySearch) setErrors(prev => ({ ...prev, companySearch: null }));
+                                                    validateUpTo('companySearch', { company: searchTerm, university: '' });
                                                 }}
                                             >
                                                 <Plus size={14} />
@@ -902,7 +907,7 @@ const App = () => {
                                                 onClick={() => {
                                                     setFormData(prev => ({ ...prev, attendedBefore: idx }));
                                                     if (errors.attendedBefore) setErrors(prev => ({ ...prev, attendedBefore: null }));
-                                                    setTimeout(() => validateUpTo('attendedBefore'), 0);
+                                                    validateUpTo('attendedBefore', { attendedBefore: idx });
                                                 }}
                                             >
                                                 <div className="tick-mark"></div>
@@ -925,7 +930,7 @@ const App = () => {
                                 onChange={(val) => {
                                     setFormData(prev => ({ ...prev, referral: val }))
                                     if (errors.referral) setErrors(prev => ({ ...prev, referral: null }))
-                                    setTimeout(() => validateUpTo('referral'), 0);
+                                    validateUpTo('referral', { referral: val });
                                 }}
                                 placeholder="Select source"
                                 allowAdd={false}
@@ -945,7 +950,7 @@ const App = () => {
                                             const updated = current.includes(item) ? current.filter(x => x !== item) : [...current, item];
                                             setFormData(prev => ({ ...prev, takeaways: updated }));
                                             if (errors.takeaways) setErrors(prev => ({ ...prev, takeaways: null }));
-                                            setTimeout(() => validateUpTo('takeaways'), 0);
+                                            validateUpTo('takeaways', { takeaways: updated });
                                         }}
                                     >
                                         {item}
