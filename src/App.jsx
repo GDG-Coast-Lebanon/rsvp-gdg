@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import {
     Building2,
@@ -223,6 +223,18 @@ const SPECIALIZATIONS = [
     "Mobile Developer", "Product Manager", "Project Manager", "UX/UI Designer", "QA Engineer", "Other in tech", "Other non-tech"
 ]
 
+const UNIVERSITY_MAJORS = [
+    "Computer Science", "Computer Engineering", "Software Engineering", "Information Technology", "Information Systems", "Data Science", "Artificial Intelligence", "Cybersecurity", "Network Engineering", "Math & Computer Science", "Bioinformatics",
+    "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Mechatronics Engineering", "Biomedical Engineering", "Chemical Engineering", "Industrial Engineering", "Aerospace Engineering", "Petroleum Engineering", "Environmental Engineering", "Computer Communications Engineering",
+    "Business Administration", "Marketing", "Finance", "Accounting", "Economics", "Management Information Systems", "Human Resources", "Business Analytics", "Entrepreneurship", "Hospitality Management", "Supply Chain Management",
+    "Graphic Design", "UI/UX Design", "Interior Design", "Digital Media", "Multimedia Design", "Animation", "Fashion Design", "Industrial Design",
+    "Mathematics", "Physics", "Chemistry", "Biology", "Statistics", "Geology", "Environmental Science", "Astronomy",
+    "Medicine", "Pharmacy", "Nursing", "Dentistry", "Public Health", "Nutrition", "Physical Therapy", "Veterinary Medicine", "Biomedical Sciences",
+    "Law", "Political Science", "International Relations", "Psychology", "Sociology", "Education", "English Literature", "Translation", "History", "Philosophy", "Linguistics", "Anthropology",
+    "Architecture", "Fine Arts", "Journalism", "Mass Communication", "Public Relations", "Radio & Television",
+    "Other"
+]
+
 const TECH_INTERESTS = [
     "Front End", "Cloud", "Kubernetes", "Microservices", "Databases",
     "Android", "Flutter", "Machine Learning", "Tensorflow / Keras",
@@ -234,6 +246,13 @@ const TAKEAWAYS = [
     "Hands-on workshops", "Inspiring speakers",
     "Local tech community", "Career opportunities",
     "Open Source challenge", "Other"
+]
+
+const DEVFEST_ATTENDANCE_OPTIONS = [
+    "Yes",
+    "Registered,\nnever invited",
+    "Heard of it",
+    "No"
 ]
 
 const App = () => {
@@ -265,7 +284,7 @@ const App = () => {
         gender: '',
         linkedIn: '',
         phone: '',
-        attendedBefore: '',
+        attendedBefore: 3, // Defaulting to "No" (index 3) or could leave null
         takeaways: [],
         referral: '',
         techInterests: [],
@@ -282,6 +301,18 @@ const App = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [searchResults, setSearchResults] = useState([])
     const [showAddCompany, setShowAddCompany] = useState(false)
+    const [isCompanyFocused, setIsCompanyFocused] = useState(false)
+    const companySearchRef = useRef(null)
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (companySearchRef.current && !companySearchRef.current.contains(event.target)) {
+                setIsCompanyFocused(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [])
 
     useEffect(() => {
         setIsOpen(isRegistrationOpen());
@@ -291,7 +322,16 @@ const App = () => {
         const selectedUniv = UNIVERSITIES.find(u => u.abbreviation === formData.university);
         const isAlreadySelected = (selectedUniv && searchTerm === selectedUniv.full_name) || (formData.company && searchTerm === formData.company);
 
-        if (searchTerm.length > 1 && !isAlreadySelected) {
+        if (!isCompanyFocused) {
+            setSearchResults([])
+            setShowAddCompany(false)
+            return
+        }
+
+        if (searchTerm.trim() === '') {
+            setSearchResults(UNIVERSITIES)
+            setShowAddCompany(false)
+        } else {
             const results = UNIVERSITIES.filter(u => {
                 const q = searchTerm.toLowerCase()
                 return u.full_name.toLowerCase().includes(q) ||
@@ -300,11 +340,8 @@ const App = () => {
             })
             setSearchResults(results)
             setShowAddCompany(results.length === 0 && !UNIVERSITIES.find(u => u.full_name.toLowerCase() === searchTerm.toLowerCase()))
-        } else {
-            setSearchResults([])
-            setShowAddCompany(false)
         }
-    }, [searchTerm, formData.university, formData.company])
+    }, [searchTerm, formData.university, formData.company, isCompanyFocused])
 
     // Derive status simple category for the badge based on experience selection
     useEffect(() => {
@@ -335,13 +372,29 @@ const App = () => {
         if (!formData.lastName) newErrors.lastName = 'Last name is required';
         if (!formData.specialization) newErrors.specialization = 'Please select a specialization';
         if (formData.activeExpCategories.length === 0) newErrors.experience = 'Please select at least one experience category';
+
+        if (formData.phone && formData.phone.replace(/^\+?961/, '').length > 0 && !/^\+961(03\d{6}|[7-9]\d{7})$/.test(formData.phone)) {
+            newErrors.phone = 'Invalid Lebanese phone format (e.g., +961XXXXXXXX)';
+        }
+
+        if (!formData.linkedIn) {
+            newErrors.linkedIn = 'LinkedIn Link is required';
+        } else if (!/^https?:\/\/(www\.)?linkedin\.com\/.*$/.test(formData.linkedIn)) {
+            newErrors.linkedIn = 'Please provide a valid LinkedIn URL';
+        }
+
         if (!formData.region) newErrors.region = 'Please select a region';
-        if (!formData.attendedBefore) newErrors.attendedBefore = 'Please select an option';
+        if (formData.attendedBefore === '') newErrors.attendedBefore = 'Please select an option';
         if (formData.takeaways.length === 0) newErrors.takeaways = 'Please select your main takeaways';
         if (!formData.referral) newErrors.referral = 'Please select how you heard about us';
         if (!formData.attendanceType) newErrors.attendanceType = 'Please select your expected attendance';
         if (!formData.company && !formData.university && !searchTerm) {
             newErrors.companySearch = 'Company or university is required. Search and select or add a new one.';
+        }
+
+        const isProfOrFresh = formData.status === 'professional' || formData.status === 'fresh_graduate';
+        if (!isProfOrFresh && (formData.university || formData.company) && !formData.specialization) {
+            newErrors.specialization = 'Please select your specialization';
         }
 
         setErrors(newErrors);
@@ -361,6 +414,8 @@ const App = () => {
         e.preventDefault();
         if (validate()) {
             setIsSubmitting(true);
+            // Log form data for debugging API
+            console.log("Form Data Submitted:", formData);
             // Simulate API call
             setTimeout(() => {
                 setIsSubmitting(false);
@@ -373,10 +428,110 @@ const App = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error for this field
+        // Clear error for this field while typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
         }
+    }
+
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        validateUpTo(name, { [name]: value });
+    }
+
+    // Helper to validate all fields up to the currently interacting field
+    const validateUpTo = (currentFieldName, overrides = {}) => {
+        const currentData = { ...formData, ...overrides };
+        // Define the sequential order of all mandatory fields
+        const fieldOrder = [
+            'email',
+            'firstName',
+            'lastName',
+            'linkedIn',
+            'region',
+            'experience',
+            'specialization',
+            'companySearch', // Represents Company/University requirement
+            'attendedBefore',
+            'referral',
+            'takeaways',
+            'attendanceType'
+        ];
+
+        // Add secret code to the beginning if VIP
+        if (isVip) {
+            fieldOrder.unshift('secretCode');
+        }
+
+        const currentIndex = fieldOrder.indexOf(currentFieldName);
+
+        // Let's run full validation logically to get all possible errors
+        const tempErrors = {};
+        if (isVip && !currentData.secretCode) tempErrors.secretCode = 'Secret code is required';
+        if (!currentData.email || !/^\S+@\S+\.\S+$/.test(currentData.email)) tempErrors.email = 'Valid email is required';
+        if (!currentData.firstName) tempErrors.firstName = 'First name is required';
+        if (!currentData.lastName) tempErrors.lastName = 'Last name is required';
+        if (!currentData.linkedIn) {
+            tempErrors.linkedIn = 'LinkedIn Link is required';
+        } else if (!/^https?:\/\/(www\.)?linkedin\.com\/.*$/.test(currentData.linkedIn)) {
+            tempErrors.linkedIn = 'Please provide a valid LinkedIn URL';
+        }
+        if (!currentData.region) tempErrors.region = 'Please select a region';
+        if (currentData.activeExpCategories.length === 0) tempErrors.experience = 'Please select at least one experience category';
+
+        const isProfOrFresh = currentData.status === 'professional' || currentData.status === 'fresh_graduate';
+        if (!isProfOrFresh && (currentData.university || currentData.company) && !currentData.specialization) {
+            tempErrors.specialization = 'Please select your specialization';
+        } else if (!currentData.specialization) {
+            tempErrors.specialization = 'Please select a specialization';
+        }
+
+        if (!currentData.company && !currentData.university && !searchTerm) {
+            tempErrors.companySearch = 'Company or university is required. Search and select or add a new one.';
+        }
+        if (currentData.attendedBefore === '') tempErrors.attendedBefore = 'Please select an option';
+        if (currentData.takeaways.length === 0) tempErrors.takeaways = 'Please select your main takeaways';
+        if (!currentData.referral) tempErrors.referral = 'Please select how you heard about us';
+        if (!currentData.attendanceType) tempErrors.attendanceType = 'Please select your expected attendance';
+
+        // We also always check phone format specifically on blur if it has a value, regardless of order
+        if (currentData.phone && currentData.phone.replace(/^\+?961/, '').length > 0 && !/^\+961(03\d{6}|[7-9]\d{7})$/.test(currentData.phone)) {
+            tempErrors.phone = 'Invalid Lebanese phone format (e.g., +961XXXXXXXX)';
+        }
+
+        setErrors(prev => {
+            const updatedErrors = { ...prev };
+
+            // Apply errors for all fields BEFORE and INCLUDING the current field in the sequence
+            // For example, if user blurs/changes 'region', evaluate 'email', 'firstName', 'lastName', 'linkedIn', AND 'region'
+            if (currentIndex !== -1) {
+                for (let i = 0; i <= currentIndex; i++) {
+                    const fieldToCheck = fieldOrder[i];
+                    if (tempErrors[fieldToCheck]) {
+                        updatedErrors[fieldToCheck] = tempErrors[fieldToCheck];
+                    }
+                }
+            } else {
+                // If it's a field not in the strict order (like phone), just check its own error
+                if (tempErrors[currentFieldName]) {
+                    updatedErrors[currentFieldName] = tempErrors[currentFieldName];
+                }
+            }
+
+            // Always clear the error of the *current* field if it has been fixed
+            if (currentIndex !== -1 && !tempErrors[currentFieldName]) {
+                updatedErrors[currentFieldName] = null;
+            } else if (!tempErrors[currentFieldName]) {
+                updatedErrors[currentFieldName] = null;
+            }
+
+            // Explicitly set phone error if it exists, clear if it doesn't and we are checking phone
+            if (currentFieldName === 'phone') {
+                updatedErrors.phone = tempErrors.phone || null;
+            }
+
+            return updatedErrors;
+        });
     }
 
     const handleMultiSelect = (name, value) => {
@@ -460,29 +615,30 @@ const App = () => {
 
                     <section className="form-section">
                         <h2>Personal Information</h2>
-                        <div className="grid-2">
-                            <FormField label="First Name" required error={errors.firstName}>
-                                <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} />
-                            </FormField>
-                            <FormField label="Last Name" required error={errors.lastName}>
-                                <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} />
-                            </FormField>
-                        </div>
 
                         <FormField label="Email" required error={errors.email}>
-                            <input type="email" name="email" placeholder="your.email@example.com" value={formData.email} onChange={handleChange} />
+                            <input type="email" name="email" placeholder="your.email@example.com" value={formData.email} onChange={handleChange} onBlur={handleBlur} />
                         </FormField>
 
-                        <div className="grid-2">
-                            <FormField label="Phone Number" error={errors.phone}>
-                                <input type="tel" name="phone" placeholder="+961 XX XXX XXX" value={formData.phone} onChange={handleChange} />
+                        <div className="grid-2-always">
+                            <FormField label="First Name" required error={errors.firstName}>
+                                <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} onBlur={handleBlur} />
                             </FormField>
-                            <FormField label="LinkedIn Profile Link (Optional)" error={errors.linkedIn}>
-                                <input type="url" name="linkedIn" placeholder="https://linkedin.com/in/..." value={formData.linkedIn} onChange={handleChange} />
+                            <FormField label="Last Name" required error={errors.lastName}>
+                                <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} onBlur={handleBlur} />
                             </FormField>
                         </div>
 
-                        <div className="grid-2">
+                        <div className="grid-2-always">
+                            <FormField label="Phone Number" error={errors.phone}>
+                                <input type="tel" name="phone" placeholder="+961 XX XXX XXX" value={formData.phone} onChange={handleChange} onBlur={handleBlur} />
+                            </FormField>
+                            <FormField label="LinkedIn Profile Link" required error={errors.linkedIn}>
+                                <input type="url" name="linkedIn" placeholder="https://linkedin.com/in/..." value={formData.linkedIn} onChange={handleChange} onBlur={handleBlur} />
+                            </FormField>
+                        </div>
+
+                        <div>
                             <FormField label="Region" required error={errors.region}>
                                 <SearchableSelect
                                     options={REGIONS}
@@ -490,11 +646,15 @@ const App = () => {
                                     onChange={(val) => {
                                         setFormData(prev => ({ ...prev, region: val }))
                                         if (errors.region) setErrors(prev => ({ ...prev, region: null }))
+                                        validateUpTo('region', { region: val });
                                     }}
-                                    placeholder="Select your region"
+                                    placeholder="Select your region or nearest"
                                     allowAdd={false}
                                 />
                             </FormField>
+                        </div>
+
+                        <div className="grid-2-always">
                             <FormField label="Age Range (Optional)">
                                 <select name="ageRange" value={formData.ageRange} onChange={handleChange} className={!formData.ageRange ? 'select-placeholder' : ''}>
                                     <option value="">Select age range</option>
@@ -503,37 +663,43 @@ const App = () => {
                                     <option value="30+">30+ years</option>
                                 </select>
                             </FormField>
-                        </div>
 
-                        <FormField label="Gender (Optional)">
-                            <select name="gender" value={formData.gender} onChange={handleChange} className={!formData.gender ? 'select-placeholder' : ''}>
-                                <option value="">Select gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                                <option value="Prefer not to say">Prefer not to say</option>
-                            </select>
-                        </FormField>
+                            <FormField label="Gender (Optional)">
+                                <select name="gender" value={formData.gender} onChange={handleChange} className={!formData.gender ? 'select-placeholder' : ''}>
+                                    <option value="">Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </select>
+                            </FormField>
+                        </div>
                     </section>
 
                     <section className="form-section">
                         <h2>Professional Profile</h2>
 
-                        <FormField label="Your Specialization" required error={errors.specialization}>
-                            <SearchableSelect
-                                options={SPECIALIZATIONS}
-                                value={formData.specialization}
-                                onChange={(val) => {
-                                    setFormData(prev => ({ ...prev, specialization: val }))
-                                    if (errors.specialization) setErrors(prev => ({ ...prev, specialization: null }))
-                                }}
-                                placeholder="Select specialization"
-                                allowAdd={false}
-                                fallbackOptions={["Other in tech", "Other non-tech"]}
-                            />
-                        </FormField>
+                        {isProfessionalOrFreshGrad && (
+                            <FormField label="Your Specialization" required error={errors.specialization}>
+                                <SearchableSelect
+                                    options={SPECIALIZATIONS}
+                                    value={formData.specialization}
+                                    onChange={(val) => {
+                                        setFormData(prev => ({ ...prev, specialization: val }))
+                                        if (errors.specialization) setErrors(prev => ({ ...prev, specialization: null }))
+                                        validateUpTo('specialization', { specialization: val });
+                                    }}
+                                    placeholder="Select specialization"
+                                    allowAdd={false}
+                                    fallbackOptions={["Other in tech", "Other non-tech"]}
+                                />
+                            </FormField>
+                        )}
 
                         <FormField label="Experience / Study Category (Select all that apply)" required error={errors.experience}>
+                            {/*add hint text */}
+                            <p className="hint" style={{ fontSize: '13px', color: '#6b7280', marginTop: '-4px', marginBottom: '12px' }}>
+                                For example if you are student and working select both, if you are software engineer and CTO select both
+                            </p>
                             <div className="pill-grid pill-grid--equal">
                                 {Object.keys(EXPERIENCE_CATEGORIES).map(cat => (
                                     <button
@@ -541,14 +707,13 @@ const App = () => {
                                         type="button"
                                         className={`pill-btn ${formData.activeExpCategories.includes(cat) ? 'active' : ''}`}
                                         onClick={() => {
-                                            setFormData(prev => {
-                                                const cats = prev.activeExpCategories;
-                                                const newCats = cats.includes(cat)
-                                                    ? cats.filter(c => c !== cat)
-                                                    : [...cats, cat];
-                                                return { ...prev, activeExpCategories: newCats };
-                                            })
+                                            const cats = formData.activeExpCategories;
+                                            const newCats = cats.includes(cat)
+                                                ? cats.filter(c => c !== cat)
+                                                : [...cats, cat];
+                                            setFormData(prev => ({ ...prev, activeExpCategories: newCats }));
                                             if (errors.experience) setErrors(prev => ({ ...prev, experience: null }));
+                                            validateUpTo('experience', { activeExpCategories: newCats });
                                         }}
                                     >
                                         {cat}
@@ -611,7 +776,7 @@ const App = () => {
                             required
                             error={errors.companySearch}
                         >
-                            <div className="search-box">
+                            <div className="search-box" ref={companySearchRef}>
                                 <div className="search-input-wrapper">
                                     <Building2 size={20} className="search-icon" />
                                     <input
@@ -622,6 +787,8 @@ const App = () => {
                                             setSearchTerm(e.target.value);
                                             if (errors.companySearch) setErrors(prev => ({ ...prev, companySearch: null }));
                                         }}
+                                        onFocus={() => setIsCompanyFocused(true)}
+                                        onClick={() => setIsCompanyFocused(true)}
                                     />
                                 </div>
                                 {isProfessionalOrFreshGrad && (
@@ -630,7 +797,7 @@ const App = () => {
                                     </span>
                                 )}
 
-                                {searchResults.length > 0 && (
+                                {searchResults.length > 0 && isCompanyFocused && (
                                     <div className="results-list">
                                         {searchResults.map(result => (
                                             <div
@@ -639,7 +806,7 @@ const App = () => {
                                                 onClick={() => {
                                                     setFormData({ ...formData, university: result.abbreviation, company: '' })
                                                     setSearchTerm(result.full_name)
-                                                    setSearchResults([])
+                                                    setIsCompanyFocused(false)
                                                 }}
                                             >
                                                 {result.full_name}
@@ -648,14 +815,13 @@ const App = () => {
                                     </div>
                                 )}
 
-                                {showAddCompany && searchTerm.length > 1 && (
+                                {showAddCompany && searchTerm.length > 1 && isCompanyFocused && (
                                     <button
                                         type="button"
                                         className="add-new-btn"
                                         onClick={() => {
                                             setFormData({ ...formData, company: searchTerm, university: '' })
-                                            setSearchResults([])
-                                            setShowAddCompany(false)
+                                            setIsCompanyFocused(false)
                                         }}
                                     >
                                         <Plus size={16} />
@@ -670,6 +836,22 @@ const App = () => {
                                 )}
                             </div>
                         </FormField>
+
+                        {!isProfessionalOrFreshGrad && (formData.company || formData.university) && (
+                            <FormField label="Your Specialization" required error={errors.specialization}>
+                                <SearchableSelect
+                                    options={UNIVERSITY_MAJORS}
+                                    value={formData.specialization}
+                                    onChange={(val) => {
+                                        setFormData(prev => ({ ...prev, specialization: val }))
+                                        if (errors.specialization) setErrors(prev => ({ ...prev, specialization: null }))
+                                        validateUpTo('specialization', { specialization: val });
+                                    }}
+                                    placeholder="e.g., Computer Science, Engineering, Business Administration"
+                                    allowAdd={true}
+                                />
+                            </FormField>
+                        )}
 
                         <div className="badge-preview">
                             <p className="preview-label">Live Badge Preview</p>
@@ -690,13 +872,45 @@ const App = () => {
                         <h2>Event Questions & Interests</h2>
 
                         <FormField label="Have you attended DevFest before?" required error={errors.attendedBefore}>
-                            <div className="radio-group">
-                                <label className="radio-label">
-                                    <input type="radio" name="attendedBefore" value="yes" checked={formData.attendedBefore === 'yes'} onChange={handleChange} /> Yes
-                                </label>
-                                <label className="radio-label">
-                                    <input type="radio" name="attendedBefore" value="no" checked={formData.attendedBefore === 'no'} onChange={handleChange} /> No
-                                </label>
+                            <div className="custom-slider-wrapper" style={{ marginTop: '30px', marginBottom: '40px' }}>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max={DEVFEST_ATTENDANCE_OPTIONS.length - 1}
+                                    step="1"
+                                    value={formData.attendedBefore}
+                                    onChange={(e) => {
+                                        const val = parseInt(e.target.value, 10);
+                                        setFormData(prev => ({ ...prev, attendedBefore: val }));
+                                        if (errors.attendedBefore) setErrors(prev => ({ ...prev, attendedBefore: null }));
+                                    }}
+                                    className="experience-range"
+                                />
+                                <div className="slider-ticks">
+                                    {DEVFEST_ATTENDANCE_OPTIONS.map((opt, idx, arr) => {
+                                        const total = arr.length - 1;
+                                        const percent = (idx / total) * 100;
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className={`slider-tick ${formData.attendedBefore === idx ? 'active' : ''}`}
+                                                style={{ left: `${percent}%` }}
+                                                onClick={() => {
+                                                    setFormData(prev => ({ ...prev, attendedBefore: idx }));
+                                                    if (errors.attendedBefore) setErrors(prev => ({ ...prev, attendedBefore: null }));
+                                                    setTimeout(() => validateUpTo('attendedBefore'), 0);
+                                                }}
+                                            >
+                                                <div className="tick-mark"></div>
+                                                <div className="tick-label" style={{ fontSize: '11px', whiteSpace: 'nowrap', display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1.2' }}>
+                                                    {opt.split('\n').map((line, i) => (
+                                                        <span key={i}>{line}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </FormField>
 
@@ -707,6 +921,7 @@ const App = () => {
                                 onChange={(val) => {
                                     setFormData(prev => ({ ...prev, referral: val }))
                                     if (errors.referral) setErrors(prev => ({ ...prev, referral: null }))
+                                    setTimeout(() => validateUpTo('referral'), 0);
                                 }}
                                 placeholder="Select source"
                                 allowAdd={false}
@@ -721,7 +936,13 @@ const App = () => {
                                         key={item}
                                         type="button"
                                         className={`pill-btn ${formData.takeaways.includes(item) ? 'active' : ''}`}
-                                        onClick={() => handleMultiSelect('takeaways', item)}
+                                        onClick={() => {
+                                            const current = formData.takeaways;
+                                            const updated = current.includes(item) ? current.filter(x => x !== item) : [...current, item];
+                                            setFormData(prev => ({ ...prev, takeaways: updated }));
+                                            if (errors.takeaways) setErrors(prev => ({ ...prev, takeaways: null }));
+                                            setTimeout(() => validateUpTo('takeaways'), 0);
+                                        }}
                                     >
                                         {item}
                                     </button>
@@ -781,6 +1002,7 @@ const App = () => {
                                     onClick={() => {
                                         setFormData({ ...formData, attendanceType: 'full_day' });
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
+                                        setTimeout(() => validateUpTo('attendanceType'), 0);
                                     }}
                                 >
                                     <div className="card-top">
@@ -799,6 +1021,7 @@ const App = () => {
                                     onClick={() => {
                                         setFormData({ ...formData, attendanceType: 'few_hours' });
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
+                                        setTimeout(() => validateUpTo('attendanceType'), 0);
                                     }}
                                 >
                                     <div className="card-top">
@@ -835,6 +1058,7 @@ const App = () => {
                                     onClick={() => {
                                         setFormData({ ...formData, attendanceType: 'afternoon' });
                                         if (errors.attendanceType) setErrors(prev => ({ ...prev, attendanceType: null }));
+                                        setTimeout(() => validateUpTo('attendanceType'), 0);
                                     }}
                                 >
                                     <div className="card-top">
